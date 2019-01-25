@@ -43,20 +43,21 @@ class MyWebServer(socketserver.BaseRequestHandler):
         else:
             Format = 'html'
         try:
-            # this handles if the requested file exists
-            if '.' in path:
-                # request for specific file
-                path = 'www' + path
-                #safety check
-                paths = path.split('/')
+            #safety check
+            paths = path.split('/')
+            if '..' in path:
                 safe = 0
                 for i in paths:
                     if i == '..':
                         safe -= 1
                     else:
                         safe += 1
-                if safe < 1:
-                    raise ValueError('Not Safe!')
+                if safe < 0:
+                    raise ValueError('Not Safe!')            
+            # this handles if the requested file exists
+            if '.' in paths[-1]:
+                # request for specific file
+                path = 'www' + path
                 response = open(path, 'rb')
             elif path[-1] == '/':
                 # request for the index file under that folder
